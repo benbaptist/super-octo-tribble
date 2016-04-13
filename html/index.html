@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<title>Super Octo Tribble</title>
+		<script>
+			scene = "title"
+			clock = 0
+			assetsToLoad = {
+				"octo": "../assets/Octo.png",
+				"flomper": "../assets/Flomper.png",
+				"flare": "../assets/Lens Flare.png",
+			}
+			assets = {}
+			loadAssets = function(){
+				for(i in assetsToLoad){
+					var asset = assetsToLoad[i]
+					var image = new Image()
+					image.src = asset
+					assets[i] = image
+				}
+				TITLEMUSIC = new Audio()
+				TITLEMUSIC.loop = true
+				TITLEMUSIC.src = "../assets/Title.ogg"
+			}
+			rand = function(i){
+				return Math.floor(Math.random() * i)
+			}
+			tick = function(){
+				var ctx = canvas.getContext("2d")
+				if(canvas.width != window.innerWidth) canvas.width = window.innerWidth
+				if(canvas.height != window.innerHeight) canvas.height = window.innerHeight
+
+				// Make a beautiful black canvas
+				var color = 100 + Math.floor(Math.sin(clock * .1) * 50)
+				ctx.fillStyle = "rgb("+color+", "+color+", "+color+")"
+				ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+				if(scene == "title"){
+					TITLEMUSIC.play()
+				}else{
+					TITLEMUSIC.stop()
+				}
+
+				switch(scene){
+					case "title":
+						var heightie = Math.sin(clock * .1) * 30
+						ctx.drawImage(assets.octo, (canvas.width / 2) - (assets.octo.width / 2) + rand(10), rand(10) + heightie)
+						var fluffie = 150 + Math.sin(clock * .1) * 300
+						ctx.drawImage(assets.flare, (canvas.width / 2) - (assets.flare.width / 2) + fluffie, rand(10) + heightie)
+
+						ctx.textAlign = "center"
+						ctx.font = "50px Comic-Sans"
+						ctx.fillStyle = "aqua"
+						ctx.fillText("CLICK ANYWHERE TO START", canvas.width / 2, canvas.height * .8)
+						break
+				}
+
+				clock += 1
+			}
+			window.onload = function(){
+				loadAssets()
+
+				canvas = document.createElement("canvas")
+				document.body.appendChild(canvas)
+				setInterval(tick, 16)
+			}
+		</script>
+		<style>
+			body{
+				margin: 0px;
+			}
+		</style>
+	</head>
+</html>

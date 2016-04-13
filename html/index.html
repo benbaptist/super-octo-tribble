@@ -8,6 +8,7 @@
 				"octo": "../assets/Octo.png",
 				"flomper": "../assets/Flomper.png",
 				"flare": "../assets/Lens Flare.png",
+				"explosion": "../assets/explosion.gif",
 			}
 			assets = {}
 			loadAssets = function(){
@@ -20,6 +21,8 @@
 				TITLEMUSIC = new Audio()
 				TITLEMUSIC.loop = true
 				TITLEMUSIC.src = "../assets/Title.ogg"
+				narrator = new Audio()
+				narrator.src = "../assets/Cutscene 1.ogg"
 			}
 			rand = function(i){
 				return Math.floor(Math.random() * i)
@@ -29,19 +32,23 @@
 				if(canvas.width != window.innerWidth) canvas.width = window.innerWidth
 				if(canvas.height != window.innerHeight) canvas.height = window.innerHeight
 
-				// Make a beautiful black canvas
-				var color = 100 + Math.floor(Math.sin(clock * .1) * 50)
-				ctx.fillStyle = "rgb("+color+", "+color+", "+color+")"
-				ctx.fillRect(0, 0, canvas.width, canvas.height)
-
 				if(scene == "title"){
 					TITLEMUSIC.play()
 				}else{
-					TITLEMUSIC.stop()
+					TITLEMUSIC.pause()
+				}
+
+				if(scene != "cutscene-1"){
+					narrator.pause()
 				}
 
 				switch(scene){
 					case "title":
+						// Make a beautiful flashy canvas
+						var color = 100 + Math.floor(Math.sin(clock * .1) * 50)
+						ctx.fillStyle = "rgb("+color+", "+color+", "+color+")"
+						ctx.fillRect(0, 0, canvas.width, canvas.height)
+
 						var heightie = Math.sin(clock * .1) * 30
 						ctx.drawImage(assets.octo, (canvas.width / 2) - (assets.octo.width / 2) + rand(10), rand(10) + heightie)
 						var fluffie = 150 + Math.sin(clock * .1) * 300
@@ -51,6 +58,48 @@
 						ctx.font = "50px Comic-Sans"
 						ctx.fillStyle = "aqua"
 						ctx.fillText("CLICK ANYWHERE TO START", canvas.width / 2, canvas.height * .8)
+						break
+					case "cutscene-1":
+						ctx.fillStyle = "aqua"
+						ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+						var t = narrator.currentTime
+
+						if(t > 5){
+							var meow = 100 + Math.floor(Math.sin(t * 8) * 100)
+							ctx.fillStyle = "rgb("+meow+", 0, 0)"
+							ctx.fillRect(0, 0, canvas.width, canvas.height)
+						}
+
+						if(t < 2.2){
+							ctx.save()
+							ctx.translate((canvas.width / 2) - (assets.octo.width / 3) + (t * 100), canvas.height - 250)
+							ctx.scale(.3, .3)
+							ctx.drawImage(assets.octo, 0, 0, canvas.width, canvas.height)
+							ctx.restore()
+
+							ctx.save()
+							ctx.translate(canvas.width - (narrator.currentTime * 100), canvas.height - 250)
+							ctx.scale(.3, .3)
+							ctx.drawImage(assets.flomper, 0, 0, canvas.width, canvas.height)
+							ctx.restore()
+						}else if(t => 2.2){
+							ctx.save()
+							ctx.translate(rand(canvas.width), rand(canvas.height))
+							ctx.scale(.3, .3)
+							ctx.drawImage(assets.octo, 0, 0, canvas.width, canvas.height)
+							ctx.restore()
+
+							ctx.save()
+							ctx.translate(rand(canvas.width), rand(canvas.height))
+							ctx.scale(.3, .3)
+							ctx.drawImage(assets.flomper, 0, 0, canvas.width, canvas.height)
+							ctx.restore()
+						}
+
+						// ctx.drawImage(assets.explosion, 0, 0, canvas.width, canvas.height)
+
+						console.log(narrator.currentTime)
 						break
 				}
 
@@ -62,6 +111,14 @@
 				canvas = document.createElement("canvas")
 				document.body.appendChild(canvas)
 				setInterval(tick, 16)
+
+				// assign events
+				document.body.onmousedown = function(){
+					if(scene == "title"){
+						scene = "cutscene-1"
+						narrator.play()
+					}
+				}
 			}
 		</script>
 		<style>
